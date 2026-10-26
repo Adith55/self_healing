@@ -1,0 +1,29 @@
+[Unit]
+# Human-readable name shown in systemctl/journalctl.
+Description=Watchdog that health-checks and restarts myapp
+# Start after the network and after the app unit has been started.
+After=network.target myapp.service
+
+[Service]
+# Needs permission to run "systemctl restart"; root is simplest for a demo.
+# For production, use a dedicated user plus a narrow sudoers rule instead.
+User=root
+# Folder the process starts in; watchdog.log is written here (placeholder path).
+WorkingDirectory=/opt/self-healing-service
+# Settings read by watchdog.py (change the values as needed).
+Environment=HEALTH_URL=http://localhost:5000/health
+Environment=SERVICE_NAME=myapp
+Environment=CHECK_INTERVAL=30
+Environment=MAX_RETRIES=3
+Environment=DRY_RUN=false
+# Environment=WEBHOOK_URL=https://example.com/your-webhook
+# Start command: use the virtualenv's Python to run the watchdog (placeholder paths).
+ExecStart=/opt/self-healing-service/venv/bin/python watchdog/watchdog.py
+# The watchdog must always be running, so restart it whatever the exit reason.
+Restart=always
+# Wait 5 seconds before restarting the watchdog itself.
+RestartSec=5
+
+[Install]
+# Start this service at normal multi-user boot.
+WantedBy=multi-user.target

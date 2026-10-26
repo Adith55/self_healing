@@ -1,0 +1,21 @@
+[Unit]
+# Human-readable name shown in systemctl/journalctl.
+Description=Self-healing demo Flask app
+# Start only after the network is available.
+After=network.target
+
+[Service]
+# Unprivileged user that runs the app (placeholder - create it first).
+User=myapp
+# Folder the process starts in (placeholder path).
+WorkingDirectory=/opt/self-healing-service
+# Start command: use the virtualenv's Python to run the app (placeholder paths).
+ExecStart=/opt/self-healing-service/venv/bin/python app/app.py
+# Restart automatically if the process exits non-zero or is killed (e.g. /crash).
+Restart=on-failure
+# Wait 3 seconds before restarting to avoid a tight crash loop.
+RestartSec=3
+
+[Install]
+# Start this service at normal multi-user boot.
+WantedBy=multi-user.target
